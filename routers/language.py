@@ -2,11 +2,14 @@ from fastapi import APIRouter, Query, Body
 from typing import Annotated
 from pydantic import BaseModel
 from dto.Language import LanguageReqDto, LanguageResDto
+from service.LanguageService import LanguageService
+
 router = APIRouter(
     prefix="/language",
     tags=["language"],
     responses={404: {"description": "Not found"}}
 )
+language_service = LanguageService()
 
 @router.post("/", status_code=200, response_model=LanguageResDto)
 async def request_to_language_model(language_req_dto: Annotated[
@@ -23,12 +26,4 @@ async def request_to_language_model(language_req_dto: Annotated[
 
     )
 ]):
-    print(language_req_dto.userId)
-    dto_instance = LanguageResDto(
-        userId=language_req_dto.userId,
-        userName=language_req_dto.userName,
-        userEmail=language_req_dto.userEmail,
-        userStatement=language_req_dto.userStatement,
-        requestedDate=language_req_dto.requestedDate
-    )
-    return dto_instance
+    return await language_service.test_method(language_req_dto)
