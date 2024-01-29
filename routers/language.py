@@ -24,4 +24,4 @@ async def request_to_language_model(language_req_dto: Annotated[LanguageReqDto, 
         })
     ],
         language_service: LanguageService = Depends(get_language_service)):
-    return language_service.test_method(language_req_dto)
+    return language_service.request_ai_response(language_req_dto)

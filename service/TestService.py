@@ -1,4 +1,4 @@
-from dto.Language import LanguageResDto, LanguageReqDto
+from test.Language import LanguageResDto, LanguageReqDto
 
 
 class TestService:

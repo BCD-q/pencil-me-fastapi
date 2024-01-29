@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Query, Body
 from typing import Annotated
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class LanguageReqDto(BaseModel):
@@ -12,8 +13,14 @@ class LanguageReqDto(BaseModel):
 
 
 class LanguageResDto(BaseModel):
+    userId: int
+    groupId: int
+    contents: str
+    deadline: datetime
+
+class LanguageResDtoDescription(BaseModel):
     userId: str
-    userName: str
-    userEmail: str
-    userStatement: str
-    requestedDate: str
+    groupId: str
+    title: str
+    contents: str
+    deadline: str
