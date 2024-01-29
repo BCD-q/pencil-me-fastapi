@@ -1,9 +1,9 @@
-from dto.Language import LanguageReqDto, LanguageResDto, LanguageResDtoDescription
+from dto.LanguageDto import LanguageReqDto, LanguageResDto, LanguageResDtoDescription
 from datetime import datetime
 import os
 import openai
 from dotenv import load_dotenv
-from dto.Common import CommonResDto
+from dto.CommonDto import CommonResDto
 import json
 
 load_dotenv()
@@ -27,14 +27,14 @@ language_res_dto = LanguageResDtoDescription(
              'If the user said words like "lunch," "dinner," or "morning" without giving a specific time, '
              'you can include a representative time for each word. For example, '
              'lunch would be 12:00 pm and dinner would be 6:00 pm. '
-             'Responses to all deadlines should be in the format YYYY-MM-DD-hh-mm.'
+             'Responses to all deadlines should be in the format YYYY-MM-DDThh-mm.'
              'If a user''s response contains no information, please mark it as null'
 )
 
 serialized_class = language_res_dto.model_dump_json()
 
 
-def create_content_prompt(self, who_requested_name, who_requested_uid, group_id):
+def create_todo_prompt(self, who_requested_name, who_requested_uid, group_id):
     # 요청 메소드 기준 위치로 설정해야 됨
     prompt1 = open('resource/request_prompt_less_token.txt', 'r', encoding='utf-8')
     response = (f"{prompt1.read()} \nwho_requested_name: {who_requested_name},  who_requested_uid: {who_requested_uid},"
@@ -45,16 +45,42 @@ def create_content_prompt(self, who_requested_name, who_requested_uid, group_id)
     return response
 
 
+def create_group_keyword(self):
+    response = ('Pick a keyword from a user''s post.'
+                'For example, "I''m going to go to an amusement park" would be "play." '
+                'Another example: "I''m going to study" would be "study" or "self-development"'
+                '<rule> Answer with words in Korean  </rule> When selecting keywords, '
+                'try to choose words that are representative of similar words and use them in your'
+                'When choosing keywords, try to choose words that are representative of similar words, '
+                'for example, "barbecue" and "hamburger" can be "food", and '
+                '"performance" and "amusement park" can be "activity". <rule> One word answer. </rule>')
+    return response
+
+
 class LanguageService:
 
     def request_ai_response(self, language_req_dto: LanguageReqDto) -> CommonResDto:
         try:
+            openai_group_title_result = openai.chat.completions.create(
+                model=AI_MODEL,
+                messages=[
+                    {"role": "system",
+                     "content": create_group_keyword(self)},
+                    {"role": "user",
+                     "content": language_req_dto.userStatement}
+                ]
+            )
+            # 서버로 요청을 보낼 키워드
+            group_keyword = openai_group_title_result.choices[0].message.content
+            print(group_keyword)
+            # 서버로부터 응답 받은 값
+            given_group_id = 1
+
             openai_result = openai.chat.completions.create(
                 model=AI_MODEL,
                 messages=[
                     {"role": "system",
-                     # 차후에 USER이름과 유저 id를 포함시켜야 함
-                     "content": create_content_prompt(self, language_req_dto.userName, language_req_dto.userId, 1)},
+                     "content": create_todo_prompt(self, language_req_dto.userName, language_req_dto.userId, given_group_id)},
                     {"role": "user",
                      "content": language_req_dto.userStatement}
                 ]

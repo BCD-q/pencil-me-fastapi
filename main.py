@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from routers import language
+from routers import LanguageRouter
 
 app = FastAPI()
 
