@@ -5,9 +5,11 @@ import openai
 from dotenv import load_dotenv
 from dto.Common import CommonResDto
 import json
+import requests
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
+URL = "https://eb62-175-223-27-96.ngrok-free.app/api/v1/categories"
 
 AI_MODEL = "gpt-3.5-turbo-1106"
 INSUFFICIENT_MONEY_MSG = "계정 요금이 충분하지 않습니다."
@@ -15,8 +17,8 @@ API_ERROR_MSG = "API 요청에 문제가 있습니다. 관리자에게 문의하
 IO_ERROR_MSG = "I/O에 문제가 있습니다. 관리자에게 문의하세요"
 
 language_res_dto = LanguageResDtoDescription(
-    userId="Include who_requested_uid in the userId",
-    groupId="Include group_id in groupId",
+    memberId="Include who_requested_uid in the memberId",
+    categoryId="Include group_id in categoryId",
     title="In the title, include a one- or two-line summary sentence that summarizes the user's answer. "
           "For example, if the user answered, "
           """I need to finish my computer algorithms assignment by 12:00 tomorrow night,
@@ -34,41 +36,66 @@ language_res_dto = LanguageResDtoDescription(
 serialized_class = language_res_dto.model_dump_json()
 
 
-def create_content_prompt(self, who_requested_name, who_requested_uid, group_id):
+def create_content_prompt(who_requested_name, who_requested_uid, group_id):
     # 요청 메소드 기준 위치로 설정해야 됨
-    prompt1 = open('resource/request_prompt_less_token.txt', 'r', encoding='utf-8')
-    response = (f"{prompt1.read()} \nwho_requested_name: {who_requested_name},  who_requested_uid: {who_requested_uid},"
+    prompt = open('resource/request_prompt_less_token.txt', 'r', encoding='utf-8')
+    response = (f"{prompt.read()} \nwho_requested_name: {who_requested_name},  who_requested_uid: {who_requested_uid},"
                 f"today's date: {datetime.now()}, group_id: {group_id},"
                 f"Response Model Description: {serialized_class}")
-    prompt1.close()
-    print(response)
+    prompt.close()
+    return response
+
+
+def create_ai_response(system_content: str, user_content: str):
+    try:
+        openai_result = openai.chat.completions.create(
+            model=AI_MODEL,
+            messages=[
+                {"role": "system",
+                 # 차후에 USER이름과 유저 id를 포함시켜야 함
+                 "content": system_content},
+                {"role": "user",
+                 "content": user_content}
+            ]
+        )
+        try:
+            response = CommonResDto(
+                msg="결과가 정상적으로 불러와졌습니다.",
+                result=json.loads(openai_result.choices[0].message.content)
+            )
+        except ValueError:
+            return openai_result.choices[0].message.content
+    except openai.RateLimitError:
+        response = CommonResDto(msg=INSUFFICIENT_MONEY_MSG)
+    except openai.APIError:
+        response = CommonResDto(msg=API_ERROR_MSG)
+    except FileNotFoundError:
+        response = CommonResDto(msg=IO_ERROR_MSG)
     return response
 
 
 class LanguageService:
 
     def request_ai_response(self, language_req_dto: LanguageReqDto) -> CommonResDto:
+        generated_category_name = create_ai_response(
+            """
+            Pick a keyword from a user's post. For example, "I'm going to go to an amusement park" would be "play." 
+            Another example: "I'm going to study" would be "study" or "self-development". <rule> Answer with 
+            words in Korean  </rule> When selecting keywords, try to choose words that are representative of similar 
+            words and use them in your When choosing keywords, try to choose words that are representative of similar 
+            words, for example, "barbecue" and "hamburger" can be "food", and 
+            "performance" and "amusement park" can be "activity". <rule> One word answer. </rule>""",
+            language_req_dto.memberStatement
+        )
         try:
-            openai_result = openai.chat.completions.create(
-                model=AI_MODEL,
-                messages=[
-                    {"role": "system",
-                     # 차후에 USER이름과 유저 id를 포함시켜야 함
-                     "content": create_content_prompt(self, language_req_dto.userName, language_req_dto.userId, 1)},
-                    {"role": "user",
-                     "content": language_req_dto.userStatement}
-                ]
-            )
-            response = CommonResDto(
-                msg="결과가 정상적으로 불러와졌습니다.",
-                result=json.loads(openai_result.choices[0].message.content)
-            )
-        except openai.RateLimitError:
-            response = CommonResDto(msg=INSUFFICIENT_MONEY_MSG)
-        except openai.APIError:
-            response = CommonResDto(msg=API_ERROR_MSG)
-        except FileNotFoundError:
-            response = CommonResDto(msg=IO_ERROR_MSG)
+            server_response = requests.post(URL, json={"name": generated_category_name})
+            group_id = server_response.json()['data']['categoryId']
+        except requests.ConnectionError:
+            group_id = 1
+
+        response = create_ai_response(
+            create_content_prompt(language_req_dto.memberName, language_req_dto.memberId, group_id),
+            language_req_dto.memberStatement)
         return response
 
 
