@@ -36,11 +36,11 @@ language_res_dto = LanguageResDtoDescription(
 serialized_class = language_res_dto.model_dump_json()
 
 
-def create_content_prompt(who_requested_name, who_requested_uid, group_id):
+def create_content_prompt(who_requested_name, who_requested_uid, category_id):
     # 요청 메소드 기준 위치로 설정해야 됨
     prompt = open('resource/request_prompt_less_token.txt', 'r', encoding='utf-8')
     response = (f"{prompt.read()} \nwho_requested_name: {who_requested_name},  who_requested_uid: {who_requested_uid},"
-                f"today's date: {datetime.now()}, group_id: {group_id},"
+                f"today's date: {datetime.now()}, group_id: {category_id},"
                 f"Response Model Description: {serialized_class}")
     prompt.close()
     return response
@@ -75,7 +75,6 @@ def create_ai_response(system_content: str, user_content: str):
 
 
 class LanguageService:
-
     def request_ai_response(self, language_req_dto: LanguageReqDto) -> CommonResDto:
         generated_category_name = create_ai_response(
             """
@@ -87,14 +86,14 @@ class LanguageService:
             "performance" and "amusement park" can be "activity". <rule> One word answer. </rule>""",
             language_req_dto.memberStatement
         )
-        try:
-            server_response = requests.post(URL, json={"name": generated_category_name})
-            group_id = server_response.json()['data']['categoryId']
-        except requests.ConnectionError:
-            group_id = 1
+        server_response = requests.post(URL, json={"name": generated_category_name})
+        if server_response.status_code != 201:
+            category_id = 1
+        else:
+            category_id = server_response.json()['data']['categoryId']
 
         response = create_ai_response(
-            create_content_prompt(language_req_dto.memberName, language_req_dto.memberId, group_id),
+            create_content_prompt(language_req_dto.memberName, language_req_dto.memberId, category_id),
             language_req_dto.memberStatement)
         return response
 
