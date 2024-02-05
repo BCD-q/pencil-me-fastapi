@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 
-from routers import Language
+from routers import LanguageRouter
 
 app = FastAPI()
 
-app.include_router(Language.router)
+app.include_router(LanguageRouter.router)
 
 @app.get("/")
 async def root():
