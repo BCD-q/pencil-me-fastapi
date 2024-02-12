@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query, Body
-from typing import Annotated
+from typing import Annotated, Optional
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -16,7 +16,7 @@ class LanguageResDto(BaseModel):
     memberId: int
     categoryId: int
     title: str
-    contents: str
+    contents: Optional[str] = None
     deadline: datetime
 
 class LanguageResDtoDescription(BaseModel):

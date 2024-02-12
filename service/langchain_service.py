@@ -5,6 +5,7 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.prompts.prompt import PromptTemplate
+from dto.language import LanguageResDto, LanguageReqDto
 
 # 입력과 예시의 유사도에 따라 몇가지의 예제를 선택해주는 선택기
 from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
@@ -33,7 +34,8 @@ class LangChainService:
     def __init__(self):
         pass
 
-    def get_response(self):
+    @staticmethod
+    def get_response(language_req_dto: LanguageReqDto, saved_keyword_id):
         # 컨테이너 기준으로 경로를 설정해줘야 함
         file_path = 'resource/corrected_detailed_events.json'
         example = json.loads(Path(file_path).read_text(encoding='UTF8'))
@@ -52,9 +54,6 @@ class LangChainService:
             k=1
         )
 
-        memberId = 1
-        categoryId = 1
-
         prompt = FewShotPromptTemplate(
             example_selector=example_selector,
             example_prompt=example_prompt,
@@ -62,17 +61,21 @@ class LangChainService:
             prefix="{format_instructions}, {current_time}, {member_id}, {category_id}",
             input_variables=["user_dialog"],
             partial_variables={"format_instructions": parser.get_format_instructions(),
-                               "member_id": memberId,
-                               "category_id": categoryId,
+                               "member_id": language_req_dto.memberId,
+                               "category_id": saved_keyword_id,
                                "current_time": str(datetime.now())}
         )
 
         chain = prompt | model | parser
 
-        # print(prompt.format(user_dialog= "친구네 집에서 아침 7시에만나서 아침을 같이 먹기로 했어"))
+        result = chain.invoke({
+            "user_dialog": "user_dialog: " + language_req_dto.memberStatement
+        })
 
-        # selected_examples = example_selector.select_examples({"user_dialog": "친구네 집에서 아침 7시에만나서 아침을 같이 먹기로 했어"})
-        # print(selected_examples)
-        print(type(chain.invoke({
-            "user_dialog": "user_dialog: 친구네 집에서 아침 7시에만나서 아침을 같이 먹기로 했어"
-        })))
+        return LanguageResDto(
+            memberId=result['memberId'],
+            categoryId=result['categoryId'],
+            title=result['title'],
+            contents=result['contents'],
+            deadline=result['deadline']
+        )
