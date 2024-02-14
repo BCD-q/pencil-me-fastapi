@@ -19,6 +19,7 @@ class LanguageResDto(BaseModel):
     contents: Optional[str] = None
     deadline: datetime
 
+
 class LanguageResDtoDescription(BaseModel):
     memberId: str
     categoryId: str

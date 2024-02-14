@@ -45,4 +45,4 @@ async def test(
             })
         ],
         llm_service: LLMService = Depends(Provide[Container.llm_service])) -> LanguageResDto:
-    return llm_service.call_function(language_req_dto)
+    return llm_service.request_llm_function(language_req_dto)
