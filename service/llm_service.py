@@ -4,7 +4,7 @@ from service.langchain_service import LangChainService
 from dto.language import LanguageResDto, LanguageReqDto
 import requests
 
-URL = "http://localhost:7800/api/v1/language"
+URL = "http://localhost:7800/api/v1/categories"
 
 
 class LLMService:
