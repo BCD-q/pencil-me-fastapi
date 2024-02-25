@@ -19,9 +19,7 @@ import os
 
 import json
 from pathlib import Path
-API_KEY = os.getenv("OPENAI_API_KEY")
-
-model = ChatOpenAI(temperature=0, openai_api_key=API_KEY)
+model = ChatOpenAI(temperature=0)
 
 
 class LangChainResponse(BaseModel):
