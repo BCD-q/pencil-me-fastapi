@@ -15,11 +15,12 @@ from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
 from langchain_community.vectorstores import Chroma
 # 문자들을 벡터로 변환해주는 임베딩 클래스
 from langchain_openai import OpenAIEmbeddings
+import os
 
 import json
 from pathlib import Path
 
-model = ChatOpenAI(temperature=0)
+model = ChatOpenAI(temperature=0, openai_api_key=os.getenv("OPENAI_API_KEY"))
 
 
 class LangChainResponse(BaseModel):

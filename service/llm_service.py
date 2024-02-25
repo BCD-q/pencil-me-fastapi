@@ -1,9 +1,11 @@
-from service import langchain_service
+import os
+
 from service.langchain_service import LangChainService
 from dto.language import LanguageResDto, LanguageReqDto
 import requests
 
-URL = "https://eb62-175-223-27-96.ngrok-free.app/api/v1/categories"
+URL = os.getenv("SPRING_URL")
+
 
 class LLMService:
     def __init__(self, langchain_service: LangChainService):
@@ -23,4 +25,3 @@ class LLMService:
         # 반환된 id함께 languageReq를 함수로 보내 LanguageRes를 반환받음
         # 결과로 반환받은 LanguageRes를 반환
         return self.langchain_service.summarize_dialog(language_req_dto, saved_keyword_id)
-
