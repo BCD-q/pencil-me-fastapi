@@ -22,7 +22,7 @@ router = APIRouter(
 async def summarize(
         language_req_dto: Annotated[LanguageReqDto, Body(
             example={
-                "memberId": "1",
+                "memberId": 1,
                 "memberName": "홍길동",
                 "memberEmail": "test@test.com",
                 "memberStatement": "내일 저녁 6시에 친구랑 잠실종합운동장역 앞에서 만나기로 했어. 친구랑 만난 후에는 조용필 콘서트를 볼거야",
