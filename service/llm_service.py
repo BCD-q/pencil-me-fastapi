@@ -15,6 +15,7 @@ class LLMService:
 
     # languageReq -> languageRes
     def request_llm_function(self, language_req_dto: LanguageReqDto) -> LanguageResDto:
+        print(language_req_dto)
         # languageReq -> userDialog를 함수로 보내 키워드 추출
         keyword = self.langchain_service.determine_keyword(language_req_dto.memberStatement)
         # 키워드: str을 스프링 서버로 저장 요청 보냄; 저장된 id를 리턴 받음
