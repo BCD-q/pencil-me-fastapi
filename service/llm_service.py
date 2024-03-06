@@ -1,10 +1,12 @@
 import os
 
+from requests import RequestException
+
 from service.langchain_service import LangChainService
 from dto.language import LanguageResDto, LanguageReqDto
 import requests
 
-URL = "http://172.20.10.2:8080/api/v1/categories"
+URL = "http://capstone.na2ru2.me/api/v1/categories"
 
 
 class LLMService:
@@ -17,11 +19,11 @@ class LLMService:
         keyword = self.langchain_service.determine_keyword(language_req_dto.memberStatement)
         # 키워드: str을 스프링 서버로 저장 요청 보냄; 저장된 id를 리턴 받음
         print(keyword)
-        server_response = requests.post(URL, json={"name": keyword})
-        if server_response.status_code != 201:
-            saved_keyword_id = 1
-        else:
+        try:
+            server_response = requests.post(URL, json={"name": keyword})
             saved_keyword_id = server_response.json()['data']['categoryId']
+        except RequestException:
+            saved_keyword_id = 1
         # 반환된 id함께 languageReq를 함수로 보내 LanguageRes를 반환받음
         # 결과로 반환받은 LanguageRes를 반환
         return self.langchain_service.summarize_dialog(language_req_dto, saved_keyword_id)
