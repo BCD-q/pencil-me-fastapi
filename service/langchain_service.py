@@ -19,7 +19,9 @@ import os
 
 import json
 from pathlib import Path
-model = ChatOpenAI(temperature=0)
+openai_api_key = os.getenv("OPENAI_API_KEY")
+
+model = ChatOpenAI(openai_api_key=openai_api_key, temperature=0)
 
 
 class LangChainResponse(BaseModel):
@@ -99,7 +101,7 @@ class LangChainService:
             example,
             OpenAIEmbeddings(),
             Chroma,
-            k=1
+            k=4
         )
 
         prompt = FewShotPromptTemplate(

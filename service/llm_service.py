@@ -6,7 +6,7 @@ from service.langchain_service import LangChainService
 from dto.language import LanguageResDto, LanguageReqDto
 import requests
 
-URL = "http://capstone.na2ru2.me/api/v1/categories"
+URL = os.getenv('SPRING_SERVER_URL')
 
 
 class LLMService:
