@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-import datetime
+from langchain_core.pydantic_v1 import BaseModel, Field
+from datetime import datetime
 
 
 class LangChainResponse(BaseModel):

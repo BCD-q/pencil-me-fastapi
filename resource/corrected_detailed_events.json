@@ -130,6 +130,10 @@
     },
     {
         "user_dialog": "오늘 저녁 11시에 친구들이랑 만나기로 했어 장소는 도웅이네 집이야",
-        "answer": "memberId id memerId, categoryId is categoryId, title is 도웅이집에서 친구들과의 만남, content is null, deadline 2024-03-12T23:00:00"
+        "answer": "memberId is memberId, categoryId is categoryId, title is 도웅이집에서 친구들과의 만남, content is null, deadline 2024-03-12T23:00:00"
+    },
+    {
+        "user_dialog": "오늘 저녁에 친구랑 8시에 만나서 모여서 코딩을 하기로 했어",
+        "answer": "memberId is memberId, categoryId is categoryId, title is 친구들과 모여서 코딩하기, content is null, deadline 2024-03-12T20:00:00"
     }
 ]

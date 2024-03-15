@@ -1,13 +1,13 @@
 from datetime import datetime
 
 from langchain_core.output_parsers import JsonOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.prompts.prompt import PromptTemplate
 from dto.language import LanguageResDto, LanguageReqDto
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from dto.langchain import LangChainResponse
 
 # 입력과 예시의 유사도에 따라 몇가지의 예제를 선택해주는 선택기
 from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
@@ -24,18 +24,6 @@ load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 model = ChatOpenAI(openai_api_key=openai_api_key, temperature=0)
-
-
-class LangChainResponse(BaseModel):
-    memberId: int = Field(description="""Include in prefix 'member_id' in the memberId""")
-    categoryId: int = Field(description="Include in prefix 'category_id' in categoryId")
-    title: str = Field(description="""In the title, include a one- or two-line summary sentence 
-                                      that summarizes in the suffix 'user_dialog'""")
-    contents: str = Field(description="Take notes summarizing the user's sentence. If there is no content, output null "
-                                      "<important!>None is null</important> ")
-    deadline: datetime = Field(description="Inside the deadline, you can infer the deadline as a date and time "
-                                           "based on the date in 'current_time'. ")
-
 
 class LangChainService:
     def __init__(self):
@@ -87,7 +75,7 @@ class LangChainService:
         })
 
     @staticmethod
-    def summarize_dialog(language_req_dto: LanguageReqDto, saved_keyword_id):
+    def summarize_dialog(language_req_dto: LanguageReqDto, saved_keyword_id) -> LanguageResDto:
         # 컨테이너 기준으로 경로를 설정해줘야 함
         file_path = 'resource/corrected_detailed_events.json'
         example = json.loads(Path(file_path).read_text(encoding='UTF8'))
