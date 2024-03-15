@@ -5,6 +5,9 @@ from requests import RequestException
 from service.langchain_service import LangChainService
 from dto.language import LanguageResDto, LanguageReqDto
 import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 URL = os.getenv('SPRING_SERVER_URL')
 

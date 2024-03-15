@@ -16,11 +16,13 @@ from langchain_community.vectorstores import Chroma
 # 문자들을 벡터로 변환해주는 임베딩 클래스
 from langchain_openai import OpenAIEmbeddings
 import os
-
+from dotenv import load_dotenv
 import json
 from pathlib import Path
-openai_api_key = os.getenv("OPENAI_API_KEY")
 
+load_dotenv()
+
+openai_api_key = os.getenv("OPENAI_API_KEY")
 model = ChatOpenAI(openai_api_key=openai_api_key, temperature=0)
 
 
