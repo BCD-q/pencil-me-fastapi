@@ -27,7 +27,7 @@ class LLMService:
             server_response = requests.post(URL, json={"name": keyword})
             saved_keyword_id = server_response.json()['data']['categoryId']
         except RequestException:
-            saved_keyword_id = 1
+            saved_keyword_id = -1
         # 반환된 id함께 languageReq를 함수로 보내 LanguageRes를 반환받음
         # 결과로 반환받은 LanguageRes를 반환
         return self.langchain_service.summarize_dialog(language_req_dto, saved_keyword_id)

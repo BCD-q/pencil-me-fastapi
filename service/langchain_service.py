@@ -129,19 +129,20 @@ class LangChainService:
         prompt = PromptTemplate(
             template="""
             You're an API that answers small sentences in the form of a JSON response.
-Respond to the sentence I wrote with the following rules.
-The rules for the response are in the Response Model Description at the bottom.
-No matter what the request, the response must be of the form.
-The answer in the value should be in Korean so that Korean people can understand it.
+            Respond to the sentence I wrote with the following rules.
+            The rules for the response are in the Response Model Description at the bottom.
+            No matter what the request, the response must be of the form.
+            The answer in the value should be in Korean so that Korean people can understand it.
 
-Here's some information for your reference\n {format_instructions} requestedDate = {current_time}, memberId = {member_id}, 
-categoryId= {category_id}, {input}
+            Here's some information for your reference\n 
+            {format_instructions} \n !prefix_requestedDate! = {requested_date}, \n memberId = {member_id}, \n
+            categoryId= {category_id}, \n {input}
             """,
             input_variables=["input"],
             partial_variables={"format_instructions": output_parser.get_format_instructions(),
                                "member_id": language_req_dto.memberId,
                                "category_id": saved_keyword_id,
-                               "current_time": str(datetime.now())}
+                               "requested_date": language_req_dto.requestedDate}
         )
 
         chain = prompt | model | output_parser
@@ -151,6 +152,7 @@ categoryId= {category_id}, {input}
         })
 
         print(result)
+
         return LanguageResDto(
             memberId=language_req_dto.memberId,
             categoryId=saved_keyword_id,
