@@ -25,6 +25,7 @@ load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 model = ChatOpenAI(openai_api_key=openai_api_key, temperature=0)
 
+
 class LangChainService:
     def __init__(self):
         pass
@@ -75,7 +76,7 @@ class LangChainService:
         })
 
     @staticmethod
-    def summarize_dialog(language_req_dto: LanguageReqDto, saved_keyword_id) -> LanguageResDto:
+    def summarize_dialog_fewShotPrompt(language_req_dto: LanguageReqDto, saved_keyword_id) -> LanguageResDto:
         # 컨테이너 기준으로 경로를 설정해줘야 함
         file_path = 'resource/corrected_detailed_events.json'
         example = json.loads(Path(file_path).read_text(encoding='UTF8'))
@@ -83,8 +84,8 @@ class LangChainService:
         parser = JsonOutputParser(pydantic_object=LangChainResponse)
 
         example_prompt = PromptTemplate(
-            template="{user_dialog}\n{answer}",
-            input_variables=["user_dialog", "answer"]
+            template="{user_dialog}\n {title}",
+            input_variables=["user_dialog", "title"]
         )
 
         example_selector = SemanticSimilarityExampleSelector.from_examples(
@@ -98,7 +99,8 @@ class LangChainService:
             example_selector=example_selector,
             example_prompt=example_prompt,
             suffix="user_dialog: {user_dialog}",
-            prefix="{format_instructions}, {current_time}, {member_id}, {category_id}",
+            prefix="{format_instructions}, requestedDate = {current_time}, memberId = {member_id}, categoryId= {"
+                   "category_id}",
             input_variables=["user_dialog"],
             partial_variables={"format_instructions": parser.get_format_instructions(),
                                "member_id": language_req_dto.memberId,
@@ -115,6 +117,43 @@ class LangChainService:
         return LanguageResDto(
             memberId=result['memberId'],
             categoryId=result['categoryId'],
+            title=result['title'],
+            contents=result['contents'],
+            deadline=result['deadline']
+        )
+
+    @staticmethod
+    def summarize_dialog(language_req_dto: LanguageReqDto, saved_keyword_id: int) -> LanguageResDto:
+        output_parser = JsonOutputParser(pydantic_object=LangChainResponse)
+
+        prompt = PromptTemplate(
+            template="""
+            You're an API that answers small sentences in the form of a JSON response.
+Respond to the sentence I wrote with the following rules.
+The rules for the response are in the Response Model Description at the bottom.
+No matter what the request, the response must be of the form.
+The answer in the value should be in Korean so that Korean people can understand it.
+
+Here's some information for your reference\n {format_instructions} requestedDate = {current_time}, memberId = {member_id}, 
+categoryId= {category_id}, {input}
+            """,
+            input_variables=["input"],
+            partial_variables={"format_instructions": output_parser.get_format_instructions(),
+                               "member_id": language_req_dto.memberId,
+                               "category_id": saved_keyword_id,
+                               "current_time": str(datetime.now())}
+        )
+
+        chain = prompt | model | output_parser
+
+        result = chain.invoke({
+            "input": language_req_dto.memberStatement
+        })
+
+        print(result)
+        return LanguageResDto(
+            memberId=language_req_dto.memberId,
+            categoryId=saved_keyword_id,
             title=result['title'],
             contents=result['contents'],
             deadline=result['deadline']
