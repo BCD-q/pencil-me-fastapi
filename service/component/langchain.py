@@ -7,7 +7,7 @@ from langchain.prompts.prompt import PromptTemplate
 from dto.language import LanguageResDto, LanguageReqDto
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from dto.langchain import LangChainResponse
+from dto.langchain import LangChainSummarizeDialogResponse, LangChainSummarizeBodyResponse
 
 # 입력과 예시의 유사도에 따라 몇가지의 예제를 선택해주는 선택기
 from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
@@ -26,7 +26,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 model = ChatOpenAI(openai_api_key=openai_api_key, temperature=0)
 
 
-class LangChainService:
+class LangChain:
     def __init__(self):
         pass
 
@@ -81,7 +81,7 @@ class LangChainService:
         file_path = 'resource/corrected_detailed_events.json'
         example = json.loads(Path(file_path).read_text(encoding='UTF8'))
 
-        parser = JsonOutputParser(pydantic_object=LangChainResponse)
+        parser = JsonOutputParser(pydantic_object=LangChainSummarizeDialogResponse)
 
         example_prompt = PromptTemplate(
             template="{user_dialog}\n {title}",
@@ -124,7 +124,7 @@ class LangChainService:
 
     @staticmethod
     def summarize_dialog(language_req_dto: LanguageReqDto, saved_keyword_id: int) -> LanguageResDto:
-        output_parser = JsonOutputParser(pydantic_object=LangChainResponse)
+        output_parser = JsonOutputParser(pydantic_object=LangChainSummarizeDialogResponse)
 
         prompt = PromptTemplate(
             template="""
@@ -160,3 +160,28 @@ class LangChainService:
             contents=result['contents'],
             deadline=result['deadline']
         )
+
+    @staticmethod
+    def summarize_body(body_text: str):
+        output_parser = JsonOutputParser(pydantic_object=LangChainSummarizeBodyResponse)
+        prompt = PromptTemplate(
+            template= """
+            You're the summarizer of the article.
+            Summarize the article provided in 2-6 lines
+            The answer in the value should be in Korean so that Korean people can understand it.
+            
+            {format_instructions} \n
+            {input}
+            """,
+            input_variables=["input"],
+            partial_variables={"format_instructions": output_parser.get_format_instructions()}
+        )
+
+        chain = prompt | model | output_parser
+
+        print(body_text)
+        result = chain.invoke({
+            "input": body_text
+        })
+
+        print(result)

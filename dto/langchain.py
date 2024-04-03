@@ -2,7 +2,7 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 from datetime import datetime
 
 
-class LangChainResponse(BaseModel):
+class LangChainSummarizeDialogResponse(BaseModel):
     memberId: int = Field(description="""<important!>Include in prefix 'member_id' in the memberId</important!>""")
     categoryId: int = Field(description="Include in prefix 'category_id' in categoryId")
     title: str = Field(description="""
@@ -22,3 +22,8 @@ class LangChainResponse(BaseModel):
                                              'you can include a representative time for each word. For example, '
                                             'lunch would be 12:00 pm and dinner would be 6:00 pm. '
                                                                                 """)
+
+
+class LangChainSummarizeBodyResponse(BaseModel):
+    title: str = Field(description="This should contain the title of the summarized sentence.")
+    contents: str = Field(description="This should contain 2-4 lines of summarized text.")
