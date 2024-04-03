@@ -32,8 +32,7 @@ def suggestion_for_me(suggestion_for_me_req_dto: Annotated[SuggestionForMeReqDto
     example={
         "keyword": ["키워드1", "키워드2", "키워드3"]
     })
-        ], inspiration_service: InspirationService = Depends(Provide[Container.inspiration_service])):
-
+], inspiration_service: InspirationService = Depends(Provide[Container.inspiration_service])):
     return CommonResDto(
         msg="The inspiration",
         result={
@@ -44,7 +43,7 @@ def suggestion_for_me(suggestion_for_me_req_dto: Annotated[SuggestionForMeReqDto
 
 @router.get("/page-crawler", status_code=200, response_model=CommonResDto)
 @inject
-def page_crawler(url: str, inspiration_service: InspirationService=Depends(Provide[Container.inspiration_service])):
+def page_crawler(url: str, inspiration_service: InspirationService = Depends(Provide[Container.inspiration_service])):
     return CommonResDto(
         msg="The inspiration",
         result={

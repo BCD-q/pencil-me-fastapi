@@ -53,5 +53,4 @@ class InspirationService:
     def page_summary(self, url: str):
         # page_crawler에서 페이지 크롤링 메소드 호출
         body_text = self.page_crawler.get_page_contents(url)
-        self.langchain.summarize_body(body_text)
-        pass
+        return self.langchain.summarize_web_page_body(body_text)

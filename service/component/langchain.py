@@ -162,12 +162,12 @@ class LangChain:
         )
 
     @staticmethod
-    def summarize_body(body_text: str):
+    def summarize_web_page_body(body_text: str) -> LangChainSummarizeBodyResponse:
         output_parser = JsonOutputParser(pydantic_object=LangChainSummarizeBodyResponse)
         prompt = PromptTemplate(
-            template= """
+            template="""
             You're the summarizer of the article.
-            Summarize the article provided in 2-6 lines
+            Summarize the article provided in 2-3 lines
             The answer in the value should be in Korean so that Korean people can understand it.
             
             {format_instructions} \n
@@ -179,9 +179,8 @@ class LangChain:
 
         chain = prompt | model | output_parser
 
-        print(body_text)
         result = chain.invoke({
             "input": body_text
         })
 
-        print(result)
+        return result

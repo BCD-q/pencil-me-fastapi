@@ -26,4 +26,5 @@ class LangChainSummarizeDialogResponse(BaseModel):
 
 class LangChainSummarizeBodyResponse(BaseModel):
     title: str = Field(description="This should contain the title of the summarized sentence.")
-    contents: str = Field(description="This should contain 2-4 lines of summarized text.")
+    contents: str = Field(description="This should contain 2-3 lines of summarized text. and Skip the line if it gets "
+                                      "too long")
