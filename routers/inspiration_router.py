@@ -34,11 +34,20 @@ def suggestion_for_me(suggestion_for_me_req_dto: Annotated[SuggestionForMeReqDto
     })
         ], inspiration_service: InspirationService = Depends(Provide[Container.inspiration_service])):
 
-    print(suggestion_for_me_req_dto.keyword)
-    inspiration_service.google_search_engine_service.google_search_engine(suggestion_for_me_req_dto.keyword)
     return CommonResDto(
         msg="The inspiration",
         result={
-            "hi": suggestion_for_me_req_dto.keyword
+            "data": inspiration_service.suggestion_for_me(suggestion_for_me_req_dto.keyword)
+        }
+    )
+
+
+@router.get("/page-crawler", status_code=200, response_model=CommonResDto)
+@inject
+def page_crawler(url: str, inspiration_service: InspirationService=Depends(Provide[Container.inspiration_service])):
+    return CommonResDto(
+        msg="The inspiration",
+        result={
+            "data": inspiration_service.page_summary(url)
         }
     )

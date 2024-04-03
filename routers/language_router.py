@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, Depends
 from typing import Annotated
 from dto.language import LanguageReqDto, LanguageResDto
 from dto.common import CommonResDto
-from service.language_service import get_language_service, LanguageService
+from service.component.language import get_language_service, LanguageService
 from containers import Container
 from dependency_injector.wiring import inject, Provide
 from service.llm_service import LLMService
