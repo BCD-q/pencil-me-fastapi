@@ -7,7 +7,7 @@ from langchain.prompts.prompt import PromptTemplate
 from dto.language import LanguageResDto, LanguageReqDto
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from dto.langchain import LangChainSummarizeDialogResponse, LangChainSummarizeBodyResponse
+from dto.langchain import LangChainSummarizeDialogResponse, LangChainSummarizeWebBodyResponse, LangChainSummarizeLangChainSummarizeWebBodyResponse
 
 # 입력과 예시의 유사도에 따라 몇가지의 예제를 선택해주는 선택기
 from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
@@ -162,8 +162,8 @@ class LangChain:
         )
 
     @staticmethod
-    def summarize_web_page_body(body_text: str) -> LangChainSummarizeBodyResponse:
-        output_parser = JsonOutputParser(pydantic_object=LangChainSummarizeBodyResponse)
+    def summarize_web_page_body(body_text: str) -> LangChainSummarizeWebBodyResponse:
+        output_parser = JsonOutputParser(pydantic_object=LangChainSummarizeWebBodyResponse)
         prompt = PromptTemplate(
             template="""
             You're the summarizer of the article.
@@ -181,6 +181,28 @@ class LangChain:
 
         result = chain.invoke({
             "input": body_text
+        })
+
+        return result
+
+    @staticmethod
+    def summarize_web_body_and_dialog(langcain_summarize_web_body: LangChainSummarizeWebBodyResponse) -> (
+            LangChainSummarizeLangChainSummarizeWebBodyResponse):
+        output_parser = JsonOutputParser(pydantic_object=LangChainSummarizeLangChainSummarizeWebBodyResponse)
+        prompt = PromptTemplate(
+            template="""
+            
+            {format_instructions} \n
+            {input}
+            """,
+            input_variables=["input"],
+            partial_variables={"format_instructions": output_parser.get_format_instructions()}
+        )
+
+        chain = prompt | model | output_parser
+
+        result = chain.invoke({
+            "input": langcain_summarize_web_body
         })
 
         return result

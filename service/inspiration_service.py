@@ -2,6 +2,8 @@ from service.component.google_search_engine import GoogleSearchEngineService
 from service.component.page_crawler import PageCrawler
 from service.component.langchain import LangChain
 from dto.inspiration import SuggestionForMeResDto, SuggestionOfTheDayDto
+from dto.langchain import LangChainSummarizeWebBodyResponse
+from dto.language import LanguageReqDto
 
 
 class InspirationService:
@@ -44,13 +46,18 @@ class InspirationService:
 
         return suggestion_for_me_res_list
 
-    def add_it_right_away(self):
-        # 페이지 요약 후 할일로 변환
-        # 하단 page_summary 호출 후
+    # 페이지 요약 후 할일로 변환
+    # 사용자 정보와 URL을 받아서 작업을 수행한다.
+    def add_it_right_away(self, language_req_dto: LanguageReqDto, url: str):
+        # 하단 page_summary 호출 후 페이지 요약 정보를 저장한다.
+        page_summary = self.page_summary(url)
+        # page_summary를 함수로 보내 키워드 추출
+        
         # langchain에서 할 일 등록 메소드 호출
-        pass
+        self.langchain.summarize_web_body_and_dialog(page_summary)
+        return
 
-    def page_summary(self, url: str):
+    def page_summary(self, url: str) -> LangChainSummarizeWebBodyResponse:
         # page_crawler에서 페이지 크롤링 메소드 호출
         body_text = self.page_crawler.get_page_contents(url)
         return self.langchain.summarize_web_page_body(body_text)

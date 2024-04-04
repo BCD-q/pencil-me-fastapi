@@ -5,6 +5,7 @@ from service.component.langchain import LangChain
 from service.inspiration_service import InspirationService
 from service.llm_service import LLMService
 from service.component.page_crawler import PageCrawler
+from service.component.request_to_spring_server import RequestToSpringServer
 
 
 class Container(containers.DeclarativeContainer):
@@ -17,11 +18,14 @@ class Container(containers.DeclarativeContainer):
     google_search_engine = providers.Singleton(GoogleSearchEngineService)
     # Page Crawler
     page_crawler = providers.Singleton(PageCrawler)
+    # Request To Spring Server
+    request_to_spring_server = providers.Singleton(RequestToSpringServer)
 
     # LLMService에 langchain_service 프로바이더의 인스턴스를 주입
     llm_service = providers.Factory(
         LLMService,
-        langchain=langchain
+        langchain=langchain,
+        request_to_spring_server=request_to_spring_server
     )
 
     # InspirationService에 인스턴스 주입
