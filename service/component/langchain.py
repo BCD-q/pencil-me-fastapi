@@ -4,7 +4,7 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai import ChatOpenAI
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.prompts.prompt import PromptTemplate
-from dto.language import LanguageResDto, LanguageReqDto
+from dto.language import LanguageResDto, LanguageReqDto, MemberInfoReqDto
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from dto.langchain import LangChainSummarizeDialogResponse, LangChainSummarizeWebBodyResponse, LangChainSummarizeLangChainSummarizeWebBodyResponse
@@ -186,23 +186,27 @@ class LangChain:
         return result
 
     @staticmethod
-    def summarize_web_body_and_dialog(langcain_summarize_web_body: LangChainSummarizeWebBodyResponse) -> (
+    def summarize_web_body_and_dialog(langchain_summarize_web_body: LangChainSummarizeWebBodyResponse,
+                                      member_info_req_dto: MemberInfoReqDto,
+                                      saved_keyword_id: int) -> (
             LangChainSummarizeLangChainSummarizeWebBodyResponse):
         output_parser = JsonOutputParser(pydantic_object=LangChainSummarizeLangChainSummarizeWebBodyResponse)
         prompt = PromptTemplate(
             template="""
             
-            {format_instructions} \n
-            {input}
+            {format_instructions} \n memberId = {member_id}, \n
+            categoryId= {category_id}, \n {input}
             """,
             input_variables=["input"],
-            partial_variables={"format_instructions": output_parser.get_format_instructions()}
+            partial_variables={"format_instructions": output_parser.get_format_instructions(),
+                               "member_id": member_info_req_dto.memberId,
+                               "category_id": saved_keyword_id}
         )
 
         chain = prompt | model | output_parser
 
         result = chain.invoke({
-            "input": langcain_summarize_web_body
+            "input": langchain_summarize_web_body
         })
 
         return result

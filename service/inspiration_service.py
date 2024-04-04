@@ -1,16 +1,19 @@
 from service.component.google_search_engine import GoogleSearchEngineService
 from service.component.page_crawler import PageCrawler
 from service.component.langchain import LangChain
+from service.component.request_to_spring_server import RequestToSpringServer
 from dto.inspiration import SuggestionForMeResDto, SuggestionOfTheDayDto
 from dto.langchain import LangChainSummarizeWebBodyResponse
-from dto.language import LanguageReqDto
+from dto.language import LanguageReqDto, MemberInfoReqDto
 
 
 class InspirationService:
-    def __init__(self, google_search_engine: GoogleSearchEngineService, page_crawler: PageCrawler, langchain: LangChain):
+    def __init__(self, google_search_engine: GoogleSearchEngineService, page_crawler: PageCrawler,
+                 langchain: LangChain, request_to_spring_server: RequestToSpringServer):
         self.google_search_engine = google_search_engine
         self.page_crawler = page_crawler
         self.langchain = langchain
+        self.request_to_spring_server = request_to_spring_server
 
     def suggestion_of_the_day(self) -> list[SuggestionOfTheDayDto]:
         result = self.google_search_engine.suggestion_of_the_day()
@@ -46,16 +49,11 @@ class InspirationService:
 
         return suggestion_for_me_res_list
 
-    # 페이지 요약 후 할일로 변환
-    # 사용자 정보와 URL을 받아서 작업을 수행한다.
-    def add_it_right_away(self, language_req_dto: LanguageReqDto, url: str):
-        # 하단 page_summary 호출 후 페이지 요약 정보를 저장한다.
+    def add_it_right_away(self, member_info_req_dto: MemberInfoReqDto, url: str):
         page_summary = self.page_summary(url)
-        # page_summary를 함수로 보내 키워드 추출
-        
-        # langchain에서 할 일 등록 메소드 호출
-        self.langchain.summarize_web_body_and_dialog(page_summary)
-        return
+        keyword = self.langchain.determine_keyword(page_summary['title'])
+        saved_keyword_id = self.request_to_spring_server.save_category(keyword)
+        return self.langchain.summarize_web_body_and_dialog(page_summary, member_info_req_dto, saved_keyword_id)
 
     def page_summary(self, url: str) -> LangChainSummarizeWebBodyResponse:
         # page_crawler에서 페이지 크롤링 메소드 호출

@@ -33,6 +33,7 @@ class Container(containers.DeclarativeContainer):
         InspirationService,
         google_search_engine=google_search_engine,
         page_crawler=page_crawler,
-        langchain=langchain
+        langchain=langchain,
+        request_to_spring_server=request_to_spring_server
     )
 
