@@ -193,7 +193,8 @@ class LangChain:
         output_parser = JsonOutputParser(pydantic_object=LangChainSummarizeLangChainSummarizeWebBodyResponse)
         prompt = PromptTemplate(
             template="""
-            
+            You're an API that answers small sentences in the form of a JSON response.
+            The answer in the value should be in Korean so that Korean people can understand it.
             {format_instructions} \n memberId = {member_id}, \n
             categoryId= {category_id}, \n {input}
             """,
