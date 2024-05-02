@@ -15,22 +15,6 @@ class InspirationService:
         self.langchain = langchain
         self.request_to_spring_server = request_to_spring_server
 
-    def suggestion_of_the_day(self) -> list[SuggestionOfTheDayDto]:
-        result = self.google_search_engine.suggestion_of_the_day()
-        suggestions_of_the_day_list = []
-        for i in result['items']:
-            # pagemap의 cse_thumnail이 없을 경우 빈 값으로 대체
-            try:
-                thumbnail_url = i['pagemap']['cse_thumbnail'][0]['src']
-            except KeyError:
-                thumbnail_url = ""
-            suggestions_of_the_day_list.append(SuggestionOfTheDayDto(
-                title=i['title'],
-                link=i['link'],
-                thumbnail_url=thumbnail_url
-            ))
-        return suggestions_of_the_day_list
-
     def suggestion_for_me(self, search_keyword: list[str]) -> list[SuggestionForMeResDto]:
         result = self.google_search_engine.suggestion_for_me(search_keyword)
         suggestion_for_me_res_list = []
@@ -45,7 +29,6 @@ class InspirationService:
                 link=i['link'],
                 thumbnail_url=thumbnail_url
             ))
-            print(i)
 
         return suggestion_for_me_res_list
 
