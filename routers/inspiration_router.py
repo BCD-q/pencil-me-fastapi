@@ -17,17 +17,17 @@ container = Container()
 container.wire(modules=[__name__])
 
 
-@router.get("/me", status_code=200, response_model=CommonResDto)
+@router.post("/me", status_code=200, response_model=CommonResDto)
 @inject
 def suggestion_for_me(suggestion_for_me_req_dto: Annotated[SuggestionForMeReqDto, Body(
     example={
         "keyword": ["키워드1", "키워드2", "키워드3"]
     })
-], inspiration_service: InspirationService = Depends(Provide[Container.inspiration_service])):
+], start: int, inspiration_service: InspirationService = Depends(Provide[Container.inspiration_service])):
     return CommonResDto(
-        msg="The inspiration",
+        msg="영감 데이터 조회 완료 page:" + str(start),
         result={
-            "data": inspiration_service.suggestion_for_me(suggestion_for_me_req_dto.keyword)
+            "data": inspiration_service.suggestion_for_me(suggestion_for_me_req_dto, start)
         }
     )
 

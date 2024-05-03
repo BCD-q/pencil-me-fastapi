@@ -2,7 +2,7 @@ from service.component.google_search_engine import GoogleSearchEngineService
 from service.component.page_crawler import PageCrawler
 from service.component.langchain import LangChain
 from service.component.request_to_spring_server import RequestToSpringServer
-from dto.inspiration import SuggestionForMeResDto, SuggestionOfTheDayDto
+from dto.inspiration import SuggestionForMeResDto, SuggestionOfTheDayDto, SuggestionForMeReqDto
 from dto.langchain import LangChainSummarizeWebBodyResponse
 from dto.language import LanguageReqDto, MemberInfoReqDto
 
@@ -15,8 +15,8 @@ class InspirationService:
         self.langchain = langchain
         self.request_to_spring_server = request_to_spring_server
 
-    def suggestion_for_me(self, search_keyword: list[str]) -> list[SuggestionForMeResDto]:
-        result = self.google_search_engine.suggestion_for_me(search_keyword)
+    def suggestion_for_me(self, suggestion_for_me_req_dto: SuggestionForMeReqDto, start: int) -> list[SuggestionForMeResDto]:
+        result = self.google_search_engine.suggestion_for_me(suggestion_for_me_req_dto.keyword, start)
         suggestion_for_me_res_list = []
         for i in result['items']:
             # pagemap의 cse_thumnail이 없을 경우 빈 값으로 대체
@@ -29,7 +29,6 @@ class InspirationService:
                 link=i['link'],
                 thumbnail_url=thumbnail_url
             ))
-
         return suggestion_for_me_res_list
 
     def add_it_right_away(self, member_info_req_dto: MemberInfoReqDto, url: str):
