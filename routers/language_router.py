@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Body, Depends
-from typing import Annotated
+from fastapi import APIRouter, Body, Depends, Header
+from typing import Annotated, Union
 from dto.language import LanguageReqDto, LanguageResDto
 from dto.common import CommonResDto
 from service.component.language import get_language_service, LanguageService
@@ -44,5 +44,6 @@ async def summarize(
                 "requestedDate": "2021-11-22T14:00"
             })
         ],
+        token: Union[str, None] = Header(default=None),
         llm_service: LLMService = Depends(Provide[Container.llm_service])) -> LanguageResDto:
-    return llm_service.request_llm_function(language_req_dto)
+    return llm_service.request_llm_function(language_req_dto, token)

@@ -14,9 +14,12 @@ class RequestToSpringServer:
         pass
 
     @staticmethod
-    def save_category(keyword: str) -> int:
+    def save_category(keyword: str, authorization_token: str) -> int:
         try:
-            server_response = requests.post(URL, json={"name": keyword})
+            server_response = requests.post(URL, headers={
+                'Authorization': authorization_token
+            }, json={"name": keyword})
+            print(server_response)
             return server_response.json()['data']['categoryId']
         except RequestException:
             return -1
