@@ -38,3 +38,6 @@ class LangChainSummarizeLangChainSummarizeWebBodyResponse(BaseModel):
                                           """)
     contents: str = Field(description="Take notes summarizing the user's sentence. If there is no content, output null "
                                       "<important!>None is null</important!> ")
+
+class LangChainSuggestTaskResponse(BaseModel):
+    tasks: list[str] = Field(description="Include in prefix 'tasks' in the tasks")

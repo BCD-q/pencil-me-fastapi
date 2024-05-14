@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Body, Depends, Query
-from typing import Annotated
+from fastapi import APIRouter, Body, Depends, Header
+from typing import Annotated, Union
 from dto.common import CommonResDto
 from dto.inspiration import SuggestionForMeReqDto
 from containers import Container
@@ -55,11 +55,12 @@ def add_it_right_away_todo(
                 "memberEmail": "test@test.com"
             })
         ],
+        token: Union[str, None] = Header(default=None),
         inspiration_service: InspirationService = Depends(Provide[Container.inspiration_service])):
     return CommonResDto(
-        msg="The inspiration",
+        msg="제공된 링크로부터 할 일이 생성되었습니다.",
         result={
             # 사용자 정보와 URL을 파라미터로 넘긴다.
-            "data": inspiration_service.add_it_right_away(language_req_dto, url)
+            "data": inspiration_service.add_it_right_away(language_req_dto, url, token)
         }
     )

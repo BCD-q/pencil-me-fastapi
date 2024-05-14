@@ -31,10 +31,10 @@ class InspirationService:
             ))
         return suggestion_for_me_res_list
 
-    def add_it_right_away(self, member_info_req_dto: MemberInfoReqDto, url: str):
+    def add_it_right_away(self, member_info_req_dto: MemberInfoReqDto, url: str, token: str):
         page_summary = self.page_summary(url)
         keyword = self.langchain.determine_keyword(page_summary['title'])
-        saved_keyword_id = self.request_to_spring_server.save_category(keyword)
+        saved_keyword_id = self.request_to_spring_server.save_category(keyword, token)
         return self.langchain.summarize_web_body_and_dialog(page_summary, member_info_req_dto, saved_keyword_id)
 
     def page_summary(self, url: str) -> LangChainSummarizeWebBodyResponse:
