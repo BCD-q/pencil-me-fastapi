@@ -22,14 +22,14 @@ class Container(containers.DeclarativeContainer):
     request_to_spring_server = providers.Singleton(RequestToSpringServer)
 
     # LLMService에 langchain_service 프로바이더의 인스턴스를 주입
-    llm_service = providers.Factory(
+    llm_service = providers.Singleton(
         LLMService,
         langchain=langchain,
         request_to_spring_server=request_to_spring_server
     )
 
     # InspirationService에 인스턴스 주입
-    inspiration_service = providers.Factory(
+    inspiration_service = providers.Singleton(
         InspirationService,
         google_search_engine=google_search_engine,
         page_crawler=page_crawler,
