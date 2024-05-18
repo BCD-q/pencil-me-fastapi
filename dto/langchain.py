@@ -6,11 +6,9 @@ class LangChainSummarizeDialogResponse(BaseModel):
     memberId: int = Field(description="""<important!>Include in prefix 'member_id' in the memberId</important!>""")
     categoryId: int = Field(description="Include in prefix 'category_id' in categoryId")
     title: str = Field(description="""
-    In the title, include a one- or two-line summary sentence that summarizes the user's answer. "
-          "For example, if the user answered, "
-          I need to finish my computer algorithms assignment by 12:00 tomorrow night,
-          "" you could say, ""Finish my computer algorithms assignment.
-                                      """)
+    In the title, include a one- or two-line summary sentence that summarizes the user's answer.
+    <important>Do not include dates or details. Find an appropriate title for this to-do</important>.
+    """)
     contents: str = Field(description="Take notes summarizing the user's sentence. If there is no content, output null "
                                       "<important!>None is null</important!> ")
     deadline: datetime = Field(description="""
@@ -20,7 +18,8 @@ class LangChainSummarizeDialogResponse(BaseModel):
                                             'For example, "I have an assignment due tomorrow", the date would be today''s date plus one day.'
                                             'If the user said words like "lunch," "dinner," or "morning" without giving a specific time, '
                                              'you can include a representative time for each word. For example, '
-                                            'lunch would be 12:00 pm and dinner would be 6:00 pm. '
+                                            'lunch would be 12:00 pm and dinner would be 6:00 pm. ',
+                                            and The week starts on Monday
                                                                                 """)
 
 
