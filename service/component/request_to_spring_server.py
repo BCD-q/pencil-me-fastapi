@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from requests import RequestException
 
-URL = os.getenv('SPRING_SERVER_URL')
+BASE_URL = os.getenv('SPRING_SERVER_URL')
 
 
 class RequestToSpringServer:
@@ -16,10 +16,19 @@ class RequestToSpringServer:
     @staticmethod
     def save_category(keyword: str, authorization_token: str) -> int:
         try:
-            server_response = requests.post(URL, headers={
+            server_response = requests.post(BASE_URL + "/api/v1/categories", headers={
                 'Authorization': authorization_token
             }, json={"name": keyword})
-            print(server_response)
+            print(f"Error: {server_response.status_code} - {server_response.text}")
             return server_response.json()['data']['categoryId']
         except RequestException:
             return -1
+        except TypeError and KeyError:
+            try:
+                server_response = requests.get(BASE_URL + "/api/v1/categories/name/" + keyword, headers={
+                    'Authorization': authorization_token
+                })
+                print(f"Error: {server_response.status_code} - {server_response.text}")
+                return server_response.json()['data']['categoryId']
+            except RequestException:
+                return -1

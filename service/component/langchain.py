@@ -41,6 +41,7 @@ class LangChain:
             words, for example, "barbecue" and "hamburger" can be "food", and 
             "performance" and "amusement park" can be "activity". <rule> One word answer. 
             let me show some example</rule>
+            <important>Use only those in the examples</important>
             <example>
             "운동": "요가, 축구, 조깅, 헬스, 수영, 배드민턴, 등산, 사이클링, 댄스, 크로스핏",
             "음악": "콘서트, 라디오, 악기 연주, 작곡, 노래하기, DJing, 음악 제작, 합창, 재즈 클럽, 비닐 레코드 수집",
