@@ -35,7 +35,10 @@ class InspirationService:
         page_summary = self.page_summary(url)
         keyword = self.langchain.determine_keyword(page_summary['title'])
         saved_keyword_id = self.request_to_spring_server.save_category(keyword, token)
-        return self.langchain.summarize_web_body_and_dialog(page_summary, member_info_req_dto, saved_keyword_id)
+        result = self.langchain.summarize_web_body_and_dialog(page_summary, member_info_req_dto, saved_keyword_id)
+        result['title'] += "을(를) 더 알아보기"
+        result['contents'] += f" 링크: {url} "
+        return result
 
     def page_summary(self, url: str) -> LangChainSummarizeWebBodyResponse:
         # page_crawler에서 페이지 크롤링 메소드 호출

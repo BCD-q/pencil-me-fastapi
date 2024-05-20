@@ -36,7 +36,8 @@ class LangChainSummarizeLangChainSummarizeWebBodyResponse(BaseModel):
     categoryId: int = Field(description="Include in prefix 'category_id' in categoryId")
     title: str = Field(description="""
                                     In the title, include a one- or two-line summary sentence that summarizes the user's answer. "
-                                          """)
+                                          Don't include special characters or newline characters
+                                        """)
     contents: str = Field(description="Take notes summarizing the user's sentence. If there is no content, output null "
                                       "<important!>None is null</important!> ")
 

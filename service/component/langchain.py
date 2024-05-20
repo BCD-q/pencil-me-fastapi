@@ -170,7 +170,7 @@ class LangChain:
             You're the summarizer of the article.
             Summarize the article provided in 2-3 lines
             The answer in the value should be in Korean so that Korean people can understand it.
-            
+    
             {format_instructions} \n
             {input}
             """,
@@ -183,7 +183,7 @@ class LangChain:
         result = chain.invoke({
             "input": body_text
         })
-
+        print(result)
         return result
 
     @staticmethod
@@ -210,6 +210,5 @@ class LangChain:
         result = chain.invoke({
             "input": langchain_summarize_web_body
         })
-
         return result
 
