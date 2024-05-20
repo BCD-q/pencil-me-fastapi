@@ -5,6 +5,7 @@ from service.component.request_to_spring_server import RequestToSpringServer
 from dto.inspiration import SuggestionForMeResDto, SuggestionOfTheDayDto, SuggestionForMeReqDto
 from dto.langchain import LangChainSummarizeWebBodyResponse
 from dto.language import LanguageReqDto, MemberInfoReqDto
+from dto.common import CommonResDto
 
 
 class InspirationService:
@@ -32,7 +33,12 @@ class InspirationService:
         return suggestion_for_me_res_list
 
     def add_it_right_away(self, member_info_req_dto: MemberInfoReqDto, url: str, token: str):
-        page_summary = self.page_summary(url)
+        try:
+            page_summary = self.page_summary(url)
+        except Exception:
+            return CommonResDto(
+                msg = "아티클이 비어있습니다."
+            )
         keyword = self.langchain.determine_keyword(page_summary['title'])
         saved_keyword_id = self.request_to_spring_server.save_category(keyword, token)
         result = self.langchain.summarize_web_body_and_dialog(page_summary, member_info_req_dto, saved_keyword_id)
