@@ -28,7 +28,8 @@ class GoogleSearchEngineService:
     @staticmethod
     def suggestion_for_me(keywords: list[str], start: int) -> dict:
 
-        url = f"https://www.googleapis.com/customsearch/v1?key={google_cse_api_key}&cx={google_search_engine_id}&q={str(keywords)}&start={start}"
+        url = (f"https://www.googleapis.com/customsearch/v1?key={google_cse_api_key}&cx={google_search_engine_id}"
+               f"&q={str(keywords)}&start={start}&lr=lang_ko&num=30")
         try:
             server_response = requests.get(url)
             return server_response.json()
