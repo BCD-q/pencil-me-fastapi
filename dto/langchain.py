@@ -7,7 +7,8 @@ class LangChainSummarizeDialogResponse(BaseModel):
     categoryId: int = Field(description="Include in prefix 'category_id' in categoryId")
     title: str = Field(description="""
     In the title, include a one- or two-line summary sentence that summarizes the user's answer.
-    <important>Do not include dates or details. Find an appropriate title for this to-do</important>.
+    <important>Do not include dates or details. Find an appropriate title for this to-do </important>
+    <rule>Don't include time expressions in titles, Keep the title very short, one paragraph.</rule>.
     """)
     contents: str = Field(description="Take notes summarizing the user's sentence. If there is no content, output null "
                                       "<important!>None is null</important!> ")
